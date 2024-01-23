@@ -64,7 +64,7 @@ class RobotHardware {
     public final DcMotorEx RF, RB, LF, LB;
 
 
-    public final CRServo RF1, RF2, RB1, RB2, LF1, LF2, LB1, LB2;
+    public final CRServo RFServo, RBServo, LFServo, LBServo;
 
 
 
@@ -105,14 +105,10 @@ class RobotHardware {
         LF = hardwareMap.get(DcMotorEx.class, "LF"); // LF Encoder
         LB = hardwareMap.get(DcMotorEx.class, "LB"); // LB Encoder
 
-        RF1 = hardwareMap.get(CRServo.class, "RF1");
-        RF2 = hardwareMap.get(CRServo.class, "RF2");
-        RB1 = hardwareMap.get(CRServo.class, "RB1");
-        RB2 = hardwareMap.get(CRServo.class, "RB2");
-        LF1 = hardwareMap.get(CRServo.class, "LF1");
-        LF2 = hardwareMap.get(CRServo.class, "LF2");
-        LB1 = hardwareMap.get(CRServo.class, "LB1");
-        LB2 = hardwareMap.get(CRServo.class, "LB2");
+        RFServo = hardwareMap.get(CRServo.class, "RFServo");
+        RBServo = hardwareMap.get(CRServo.class, "RBServo");
+        LFServo = hardwareMap.get(CRServo.class, "LFServo");
+        LBServo = hardwareMap.get(CRServo.class, "LBServo");
 
 
         LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -203,14 +199,10 @@ class RobotHardware {
         }
 
         // set all servo powers at basically the same time
-        RF1.setPower(RFServoPower);
-        RF2.setPower(RFServoPower);
-        LF1.setPower(LFServoPower);
-        LF2.setPower(LFServoPower);
-        LB1.setPower(LBServoPower);
-        LB2.setPower(LBServoPower);
-        RB1.setPower(RBServoPower);
-        RB2.setPower(RBServoPower);
+        RFServo.setPower(RFServoPower);
+        LFServo.setPower(LFServoPower);
+        LBServo.setPower(LBServoPower);
+        RBServo.setPower(RBServoPower);
 
         // if the difference between current angle and target angle is greater than 90, move motor in reverse
         if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90) RF.setPower(throttle * -RFPower);
