@@ -33,7 +33,6 @@ public class BasicTeleOp extends LinearOpMode {
 
 
 
-
             robot.driveSwerveWithControllers(Math.abs(gamepad1.right_stick_x) * gamepad1.right_stick_x,
                     Math.abs(gamepad1.right_stick_y) * gamepad1.right_stick_y,
                     (Math.abs(gamepad1.left_stick_x) * gamepad1.left_stick_x) * (1 - 0.4 * gamepad1.left_trigger),
