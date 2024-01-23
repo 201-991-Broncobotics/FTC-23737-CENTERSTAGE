@@ -23,7 +23,8 @@ public class BasicTeleOp extends LinearOpMode {
 
         Gamepad driver = gamepad1, operator = gamepad2;
 
-
+        ElapsedTime mRuntime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        double LastTime = mRuntime.time();
 
         waitForStart();
 
@@ -39,6 +40,11 @@ public class BasicTeleOp extends LinearOpMode {
                     1 - 0.6 * gamepad1.left_trigger);
 
 
+            telemetry.addData("FPS:", Math.round((1 / (mRuntime.time() - LastTime)) * 1000));
+            telemetry.addData("RF:", robot.RF.getCurrentPosition());
+            telemetry.addData("LF:", robot.LF.getCurrentPosition());
+            telemetry.addData("LB:", robot.LB.getCurrentPosition());
+            telemetry.addData("RB:", robot.RB.getCurrentPosition());
             telemetry.update();
         }
     }
@@ -72,7 +78,7 @@ class RobotHardware {
 
     double WDLength = 9.133858, WDWidth = 9.763780, wheelDiameter = 3.779528, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
-    double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 1, motorRotationsPerWheelRotation = 1; // needs to be tuned
+    double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 8192, motorRotationsPerWheelRotation = 1; // needs to be tuned
 
     double servoDegreesOfError = 1; // increase this if wheels are twitching back and forth
 
@@ -165,10 +171,10 @@ class RobotHardware {
         double RBAngle = Math.atan2(A, C);
 
         // find current angle in degrees of the swerve wheel and puts it between -180 and 180
-        double currentRFPosition = angleDifference(RF.getCurrentPosition() / encoderTicksPerMotorRotation, 0, 360);
-        double currentLFPosition = angleDifference(LF.getCurrentPosition() / encoderTicksPerMotorRotation, 0, 360);
-        double currentLBPosition = angleDifference(LB.getCurrentPosition() / encoderTicksPerMotorRotation, 0, 360);
-        double currentRBPosition = angleDifference(RB.getCurrentPosition() / encoderTicksPerMotorRotation, 0, 360);
+        double currentRFPosition = angleDifference(RF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentLFPosition = angleDifference(LF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentLBPosition = angleDifference(LB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentRBPosition = angleDifference(RB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
 
         // move servos in direction of target angle or target angle + 180 depending on which one is closer
         // unless the change in angle is less than error range
@@ -207,13 +213,13 @@ class RobotHardware {
         }
 
         // if the difference between current angle and target angle is greater than 180, move motor in reverse
-        if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 180) RF.setPower(throttle * -RFPower);
+        if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90) RF.setPower(throttle * -RFPower);
         else RF.setPower(throttle * RFPower);
-        if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 180) LF.setPower(throttle * -LFPower);
+        if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 90) LF.setPower(throttle * -LFPower);
         else LF.setPower(throttle * LFPower);
-        if (Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) > 180) LB.setPower(throttle * -LBPower);
+        if (Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) > 90) LB.setPower(throttle * -LBPower);
         else LB.setPower(throttle * LBPower);
-        if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 180) RB.setPower(throttle * -RBPower);
+        if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 90) RB.setPower(throttle * -RBPower);
         else RB.setPower(throttle * RBPower);
 
     }
