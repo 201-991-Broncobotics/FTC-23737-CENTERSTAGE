@@ -100,15 +100,15 @@ class RobotHardware {
         imu.initialize(parameters);
 
 
-        RF = hardwareMap.get(DcMotorEx.class, "RF"); // RF Encoder
-        RB = hardwareMap.get(DcMotorEx.class, "RB"); // RB Encoder
-        LF = hardwareMap.get(DcMotorEx.class, "LF"); // LF Encoder
-        LB = hardwareMap.get(DcMotorEx.class, "LB"); // LB Encoder
+        RF = hardwareMap.get(DcMotorEx.class, "rfm"); // RF Encoder
+        RB = hardwareMap.get(DcMotorEx.class, "rbm"); // RB Encoder
+        LF = hardwareMap.get(DcMotorEx.class, "lfm"); // LF Encoder
+        LB = hardwareMap.get(DcMotorEx.class, "lbm"); // LB Encoder
 
-        RFServo = hardwareMap.get(CRServo.class, "RFServo");
-        RBServo = hardwareMap.get(CRServo.class, "RBServo");
-        LFServo = hardwareMap.get(CRServo.class, "LFServo");
-        LBServo = hardwareMap.get(CRServo.class, "LBServo");
+        RFServo = hardwareMap.get(CRServo.class, "rfs");
+        RBServo = hardwareMap.get(CRServo.class, "rbs");
+        LFServo = hardwareMap.get(CRServo.class, "lfs");
+        LBServo = hardwareMap.get(CRServo.class, "lbs");
 
 
         LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
