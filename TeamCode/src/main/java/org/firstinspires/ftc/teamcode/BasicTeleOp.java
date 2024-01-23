@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -28,10 +29,24 @@ public class BasicTeleOp extends LinearOpMode {
 
         waitForStart();
 
-
-
         while (opModeIsActive() && !isStopRequested()) {
 
+            if (gamepad2.dpad_left){
+                robot.DServo.setPower(-1);
+                robot.methodSleep(1500);
+                robot.DServo.setPower(1);
+                robot.methodSleep(1500);
+                robot.DServo.setPower(0);
+                telemetry.addLine("Drone Launched!");
+            }
+            if (gamepad2.left_bumper){
+                robot.LA.setPower(-1);
+                robot.RA.setPower(-1);
+            }
+            if (gamepad2.right_bumper){
+                robot.LA.setPower(1);
+                robot.RA.setPower(1);
+            }
 
 
             robot.driveSwerveWithControllers(Math.abs(gamepad1.right_stick_x) * gamepad1.right_stick_x,
@@ -61,10 +76,10 @@ class RobotHardware {
     public final BNO055IMU imu;
 
 
-    public final DcMotorEx RF, RB, LF, LB;
+    public final DcMotorEx RF, RB, LF, LB, LA, RA;
 
 
-    public final CRServo RFServo, RBServo, LFServo, LBServo;
+    public final CRServo RFServo, RBServo, LFServo, LBServo, DServo;
 
 
 
@@ -81,7 +96,7 @@ class RobotHardware {
 
     double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 8192, motorRotationsPerWheelRotation = 1; // needs to be tuned
 
-    double servoDegreesOfError = 1; // increase this if wheels are twitching back and forth
+    double servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry){
         this.telemetry = telemetry;
@@ -104,25 +119,32 @@ class RobotHardware {
         RB = hardwareMap.get(DcMotorEx.class, "rbm"); // RB Encoder
         LF = hardwareMap.get(DcMotorEx.class, "lfm"); // LF Encoder
         LB = hardwareMap.get(DcMotorEx.class, "lbm"); // LB Encoder
+        LA = hardwareMap.get(DcMotorEx.class, "la"); //Left Arm
+        RA = hardwareMap.get(DcMotorEx.class, "ra"); //Right Arm
 
         RFServo = hardwareMap.get(CRServo.class, "rfs");
         RBServo = hardwareMap.get(CRServo.class, "rbs");
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
+        DServo = hardwareMap.get(CRServo.class, "drone"); //Drone Servo
 
 
         LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         LB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         RF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         RB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        LA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        RA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         LF.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         LB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RF.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
 
-        telemetry.addData("Status", "Robot Hardware Initialized");
+        telemetry.addData("Status: ", "Robot Hardware Initialized");
         telemetry.update();
         this.map = hardwareMap;
 

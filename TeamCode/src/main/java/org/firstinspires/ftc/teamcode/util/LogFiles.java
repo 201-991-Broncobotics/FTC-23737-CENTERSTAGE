@@ -34,7 +34,7 @@ import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public final class LogFiles {
+public final class LogFiles { //Roadrunner?!?!?!
     private static final File ROOT =
             new File(AppUtil.ROOT_FOLDER + "/RoadRunner/logs/");
 

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Various regression utilities.
  */
-public class RegressionUtil {
+public class RegressionUtil { //Roadrunner?!?!
 
     /**
      * Feedforward parameter estimates from the ramp regression and additional summary statistics
