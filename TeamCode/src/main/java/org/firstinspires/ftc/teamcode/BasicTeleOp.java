@@ -41,6 +41,7 @@ public class BasicTeleOp extends LinearOpMode {
 
 
             telemetry.addData("FPS:", Math.round((1 / (mRuntime.time() - LastTime)) * 1000));
+            LastTime = mRuntime.time();
             telemetry.addData("RF:", robot.RF.getCurrentPosition());
             telemetry.addData("LF:", robot.LF.getCurrentPosition());
             telemetry.addData("LB:", robot.LB.getCurrentPosition());
@@ -133,10 +134,11 @@ class RobotHardware {
     } // initializes everything
 
 
-
-    public double angleDifference(double CurrentAngle, double TargetAngle, int wrapAngle) {
-        double result1 = Math.floorMod(Math.round((TargetAngle - CurrentAngle) * 100), wrapAngle * 100L) * 0.01;
-        double result2 = Math.floorMod(Math.round((TargetAngle - CurrentAngle) * 100), -wrapAngle * 100L) * 0.01;
+    // finds the smallest difference between two angles or wraps an angle to between -180 and 180 when target is 0 (when wrapAngle is 360)
+    // wrapAngle of 180 treats the targetAngle and the angle opposite of targetAngle the same
+    public double angleDifference(double currentAngle, double targetAngle, int wrapAngle) {
+        double result1 = Math.floorMod(Math.round((targetAngle - currentAngle) * 100), wrapAngle * 100L) * 0.01;
+        double result2 = Math.floorMod(Math.round((targetAngle - currentAngle) * 100), -wrapAngle * 100L) * 0.01;
         if (Math.abs(result1) <= Math.abs(result2)) return result1;
         else return result2;
     }
@@ -160,59 +162,57 @@ class RobotHardware {
         double LFPower = Math.sqrt(B * B + D * D);
         double LBPower = Math.sqrt(A * A + D * D);
         double RBPower = Math.sqrt(A * A + C * C);
-        double max_power = Math.max(1, Math.max(Math.max(RFPower, LFPower), Math.max(LBPower, RBPower)));
-        RFPower = RFPower / max_power; // prevent motor power from being over 1
+        double max_power = Math.max(1, Math.max(Math.max(RFPower, LFPower), Math.max(LBPower, RBPower))); // keeps all motor powers under 1
+        RFPower = RFPower / max_power; // target motor speeds
         LFPower = LFPower / max_power;
         LBPower = LBPower / max_power;
         RBPower = RBPower / max_power;
-        double RFAngle = Math.toDegrees(Math.atan2(B, C));
+        double RFAngle = Math.toDegrees(Math.atan2(B, C)); // Target wheel angles
         double LFAngle = Math.toDegrees(Math.atan2(B, D));
         double LBAngle = Math.toDegrees(Math.atan2(A, D));
         double RBAngle = Math.toDegrees(Math.atan2(A, C));
 
-        // find current angle in degrees of the swerve wheel and puts it between -180 and 180
+        // find current angle in degrees of the swerve wheel and wrap it to between -180 and 180
         double currentRFPosition = angleDifference(RF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
         double currentLFPosition = angleDifference(LF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
         double currentLBPosition = angleDifference(LB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
         double currentRBPosition = angleDifference(RB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
 
         // move servos in direction of target angle or target angle + 180 depending on which one is closer
-        // unless the change in angle is less than error range
+        // unless the change in angle is less than the error range
+        double RFServoTurnDistance = angleDifference(currentRFPosition, RFAngle, 180);
+        double LFServoTurnDistance = angleDifference(currentLFPosition, LFAngle, 180);
+        double LBServoTurnDistance = angleDifference(currentLBPosition, LBAngle, 180);
+        double RBServoTurnDistance = angleDifference(currentRBPosition, RBAngle, 180);
+        double RFServoPower = 0;
+        double LFServoPower = 0;
+        double LBServoPower = 0;
+        double RBServoPower = 0;
         if (RFPower > 0) {
-            if (angleDifference(currentRFPosition, RFAngle, 180) >= servoDegreesOfError) {
-                RF1.setPower(1);
-                RF2.setPower(1);
-            } else if (angleDifference(currentRFPosition, RFAngle, 180) <= -servoDegreesOfError) {
-                RF1.setPower(-1);
-                RF2.setPower(-1);
-            }
+            if (RFServoTurnDistance >= servoDegreesOfError) RFServoPower = -1;
+            else if (RFServoTurnDistance <= -servoDegreesOfError) RFServoPower = 1;
         } if (LFPower > 0) {
-            if (angleDifference(currentLFPosition, LFAngle, 180) >= servoDegreesOfError) {
-                LF1.setPower(1);
-                LF2.setPower(1);
-            } else if (angleDifference(currentLFPosition, LFAngle, 180) <= -servoDegreesOfError) {
-                LF1.setPower(-1);
-                LF2.setPower(-1);
-            }
+            if (LFServoTurnDistance >= servoDegreesOfError) LFServoPower = -1;
+            else if (LFServoTurnDistance <= -servoDegreesOfError) LFServoPower = 1;
         } if (LBPower > 0) {
-            if (angleDifference(currentLBPosition, LBAngle, 180) >= servoDegreesOfError) {
-                LB1.setPower(1);
-                LB2.setPower(1);
-            } else if (angleDifference(currentLBPosition, LBAngle, 180) <= -servoDegreesOfError) {
-                LB1.setPower(-1);
-                LB2.setPower(-1);
-            }
+            if (LBServoTurnDistance >= servoDegreesOfError) LBServoPower = -1;
+            else if (LBServoTurnDistance <= -servoDegreesOfError) LBServoPower = 1;
         } if (RBPower > 0) {
-            if (angleDifference(currentRBPosition, RBAngle, 180) >= servoDegreesOfError) {
-                RB1.setPower(1);
-                RB2.setPower(1);
-            } else if (angleDifference(currentRBPosition, RBAngle, 180) <= -servoDegreesOfError) {
-                RB1.setPower(-1);
-                RB2.setPower(-1);
-            }
+            if (RBServoTurnDistance >= servoDegreesOfError) RBServoPower = -1;
+            else if (RBServoTurnDistance <= -servoDegreesOfError) RBServoPower = 1;
         }
 
-        // if the difference between current angle and target angle is greater than 180, move motor in reverse
+        // set all servo powers at basically the same time
+        RF1.setPower(RFServoPower);
+        RF2.setPower(RFServoPower);
+        LF1.setPower(LFServoPower);
+        LF2.setPower(LFServoPower);
+        LB1.setPower(LBServoPower);
+        LB2.setPower(LBServoPower);
+        RB1.setPower(RBServoPower);
+        RB2.setPower(RBServoPower);
+
+        // if the difference between current angle and target angle is greater than 90, move motor in reverse
         if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90) RF.setPower(throttle * -RFPower);
         else RF.setPower(throttle * RFPower);
         if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 90) LF.setPower(throttle * -LFPower);
