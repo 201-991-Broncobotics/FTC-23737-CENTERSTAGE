@@ -76,7 +76,7 @@ class RobotHardware {
 
     ElapsedTime PIDtimer = new ElapsedTime();
 
-    double WDLength = 9.133858, WDWidth = 9.763780, wheelDiameter = 3.779528, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
+    double WDLength = 9.133858, WDWidth = 9.763780, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
     double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 8192, motorRotationsPerWheelRotation = 1; // needs to be tuned
 
@@ -222,6 +222,14 @@ class RobotHardware {
         if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 90) RB.setPower(throttle * -RBPower);
         else RB.setPower(throttle * RBPower);
 
+        telemetry.addData("RFAngle:", RFAngle);
+        telemetry.addData("LFAngle:", LFAngle);
+        telemetry.addData("LBAngle:", LBAngle);
+        telemetry.addData("RBAngle:", RBAngle);
+        telemetry.addData("RFPower:", RFPower);
+        telemetry.addData("LFPower:", LFPower);
+        telemetry.addData("LBPower:", LBPower);
+        telemetry.addData("RBPower:", RBPower);
     }
 
 
