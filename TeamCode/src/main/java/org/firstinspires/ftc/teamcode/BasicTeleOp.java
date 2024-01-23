@@ -165,10 +165,10 @@ class RobotHardware {
         LFPower = LFPower / max_power;
         LBPower = LBPower / max_power;
         RBPower = RBPower / max_power;
-        double RFAngle = Math.atan2(B, C);
-        double LFAngle = Math.atan2(B, D);
-        double LBAngle = Math.atan2(A, D);
-        double RBAngle = Math.atan2(A, C);
+        double RFAngle = Math.toDegrees(Math.atan2(B, C));
+        double LFAngle = Math.toDegrees(Math.atan2(B, D));
+        double LBAngle = Math.toDegrees(Math.atan2(A, D));
+        double RBAngle = Math.toDegrees(Math.atan2(A, C));
 
         // find current angle in degrees of the swerve wheel and puts it between -180 and 180
         double currentRFPosition = angleDifference(RF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
