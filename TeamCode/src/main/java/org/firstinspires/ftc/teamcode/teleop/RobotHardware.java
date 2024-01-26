@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,7 +17,7 @@ public class RobotHardware {
     public final Telemetry telemetry;
 
 
-    public final BNO055IMU imu;
+    // public final BNO055IMU imu;
 
 
     public final DcMotorEx RF, RB, LF, LB, LA, RA;
@@ -27,36 +28,36 @@ public class RobotHardware {
     public Servo DServo;
 
 
-    // VFB Position PID variables
+    // Position PID variables -- PID not set to anything right now
     double PosIntegralSum = 0;
     double PosKp = 0;
     double PosKi = 0;
     double PosKd = 0;
     private double PosLastError = 0;
-
     ElapsedTime PIDtimer = new ElapsedTime();
+
 
     public double WDLength = 9.133858, WDWidth = 9.763780, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
-    public double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 8192, motorRotationsPerWheelRotation = 1; // needs to be tuned
+    public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
-    public double servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        // IMU is here for probably no reason -- though if the robot stops working without it, un-comment it
 
+        // BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        // parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        // parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        // parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        // parameters.loggingEnabled = true;
+        // parameters.loggingTag = "IMU";
+        // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+        // imu = hardwareMap.get(BNO055IMU.class, "imu");
+        // imu.initialize(parameters);
 
 
         RF = hardwareMap.get(DcMotorEx.class, "rfm"); // RF Encoder
@@ -73,6 +74,12 @@ public class RobotHardware {
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
 
 
+        RFServo.setDirection(CRServo.Direction.FORWARD);
+        RBServo.setDirection(CRServo.Direction.REVERSE);
+        LFServo.setDirection(CRServo.Direction.FORWARD);
+        LBServo.setDirection(CRServo.Direction.REVERSE);
+
+
         LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         LB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         RF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -86,6 +93,7 @@ public class RobotHardware {
         RB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
@@ -152,20 +160,20 @@ public class RobotHardware {
         double LBServoPower = 0;
         double RBServoPower = 0;
         if (RFPower > 0) {
-            if (RFServoTurnDistance >= servoDegreesOfError) RFServoPower = -1;
-            else if (RFServoTurnDistance <= -servoDegreesOfError) RFServoPower = 1;
+            if (RFServoTurnDistance > servoDegreesOfError) RFServoPower = -1;
+            else if (RFServoTurnDistance < -servoDegreesOfError) RFServoPower = 1;
         }
         if (LFPower > 0) {
-            if (LFServoTurnDistance >= servoDegreesOfError) LFServoPower = -1;
-            else if (LFServoTurnDistance <= -servoDegreesOfError) LFServoPower = 1;
+            if (LFServoTurnDistance > servoDegreesOfError) LFServoPower = -1;
+            else if (LFServoTurnDistance < -servoDegreesOfError) LFServoPower = 1;
         }
         if (LBPower > 0) {
-            if (LBServoTurnDistance >= servoDegreesOfError) LBServoPower = -1;
-            else if (LBServoTurnDistance <= -servoDegreesOfError) LBServoPower = 1;
+            if (LBServoTurnDistance > servoDegreesOfError) LBServoPower = -1;
+            else if (LBServoTurnDistance < -servoDegreesOfError) LBServoPower = 1;
         }
         if (RBPower > 0) {
-            if (RBServoTurnDistance >= servoDegreesOfError) RBServoPower = -1;
-            else if (RBServoTurnDistance <= -servoDegreesOfError) RBServoPower = 1;
+            if (RBServoTurnDistance > servoDegreesOfError) RBServoPower = -1;
+            else if (RBServoTurnDistance < -servoDegreesOfError) RBServoPower = 1;
         }
 
         // set all servo powers at basically the same time
@@ -188,6 +196,11 @@ public class RobotHardware {
             RB.setPower(throttle * -RBPower);
         else RB.setPower(throttle * RBPower);
 
+
+        telemetry.addData("RF:", currentRFPosition);
+        telemetry.addData("LF:", currentLFPosition);
+        telemetry.addData("LB:", currentLBPosition);
+        telemetry.addData("RB:", currentRBPosition);
         telemetry.addData("RFAngle:", RFAngle);
         telemetry.addData("LFAngle:", LFAngle);
         telemetry.addData("LBAngle:", LBAngle);
@@ -196,10 +209,11 @@ public class RobotHardware {
         telemetry.addData("LFPower:", LFPower);
         telemetry.addData("LBPower:", LBPower);
         telemetry.addData("RBPower:", RBPower);
+        telemetry.update();
     }
 
 
-    public double PosPID(double PosReference, double PosState) {
+    public double PosPID(double PosReference, double PosState) { // PID not currently set to anything
         double PosError = PosReference - PosState;
         PosIntegralSum += PosError * PIDtimer.seconds();
         double PosDerivative = (PosError - PosLastError) / PIDtimer.seconds();
