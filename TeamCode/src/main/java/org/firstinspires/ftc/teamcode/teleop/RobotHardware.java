@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -71,6 +72,12 @@ public class RobotHardware {
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
+
+
+        RFServo.setDirection(CRServo.Direction.FORWARD);
+        RBServo.setDirection(CRServo.Direction.REVERSE);
+        LFServo.setDirection(CRServo.Direction.FORWARD);
+        LBServo.setDirection(CRServo.Direction.REVERSE);
 
 
         LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -152,20 +159,20 @@ public class RobotHardware {
         double LBServoPower = 0;
         double RBServoPower = 0;
         if (RFPower > 0) {
-            if (RFServoTurnDistance >= servoDegreesOfError) RFServoPower = -1;
-            else if (RFServoTurnDistance <= -servoDegreesOfError) RFServoPower = 1;
+            if (RFServoTurnDistance > servoDegreesOfError) RFServoPower = -1;
+            else if (RFServoTurnDistance < -servoDegreesOfError) RFServoPower = 1;
         }
         if (LFPower > 0) {
-            if (LFServoTurnDistance >= servoDegreesOfError) LFServoPower = -1;
-            else if (LFServoTurnDistance <= -servoDegreesOfError) LFServoPower = 1;
+            if (LFServoTurnDistance > servoDegreesOfError) LFServoPower = -1;
+            else if (LFServoTurnDistance < -servoDegreesOfError) LFServoPower = 1;
         }
         if (LBPower > 0) {
-            if (LBServoTurnDistance >= servoDegreesOfError) LBServoPower = -1;
-            else if (LBServoTurnDistance <= -servoDegreesOfError) LBServoPower = 1;
+            if (LBServoTurnDistance > servoDegreesOfError) LBServoPower = -1;
+            else if (LBServoTurnDistance < -servoDegreesOfError) LBServoPower = 1;
         }
         if (RBPower > 0) {
-            if (RBServoTurnDistance >= servoDegreesOfError) RBServoPower = -1;
-            else if (RBServoTurnDistance <= -servoDegreesOfError) RBServoPower = 1;
+            if (RBServoTurnDistance > servoDegreesOfError) RBServoPower = -1;
+            else if (RBServoTurnDistance < -servoDegreesOfError) RBServoPower = 1;
         }
 
         // set all servo powers at basically the same time
@@ -188,6 +195,11 @@ public class RobotHardware {
             RB.setPower(throttle * -RBPower);
         else RB.setPower(throttle * RBPower);
 
+
+        telemetry.addData("RF:", currentRFPosition);
+        telemetry.addData("LF:", currentLFPosition);
+        telemetry.addData("LB:", currentLBPosition);
+        telemetry.addData("RB:", currentRBPosition);
         telemetry.addData("RFAngle:", RFAngle);
         telemetry.addData("LFAngle:", LFAngle);
         telemetry.addData("LBAngle:", LBAngle);
@@ -196,6 +208,7 @@ public class RobotHardware {
         telemetry.addData("LFPower:", LFPower);
         telemetry.addData("LBPower:", LBPower);
         telemetry.addData("RBPower:", RBPower);
+        telemetry.update();
     }
 
 
