@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -17,10 +18,10 @@ public class RobotHardware {
     public final Telemetry telemetry;
 
 
-    // public final BNO055IMU imu;
+    public final DcMotorEx LA, RA;
 
 
-    public final DcMotorEx RF, RB, LF, LB, LA, RA;
+    public final DcMotor RF, RB, LF, LB;
 
 
     public final CRServo RFServo, RBServo, LFServo, LBServo;
@@ -46,24 +47,10 @@ public class RobotHardware {
         this.telemetry = telemetry;
 
 
-        // IMU is here for probably no reason -- though if the robot stops working without it, un-comment it
-
-        // BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        // parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        // parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        // parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-        // parameters.loggingEnabled = true;
-        // parameters.loggingTag = "IMU";
-        // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        // imu = hardwareMap.get(BNO055IMU.class, "imu");
-        // imu.initialize(parameters);
-
-
-        RF = hardwareMap.get(DcMotorEx.class, "rfm"); // RF Encoder
-        RB = hardwareMap.get(DcMotorEx.class, "rbm"); // RB Encoder
-        LF = hardwareMap.get(DcMotorEx.class, "lfm"); // LF Encoder
-        LB = hardwareMap.get(DcMotorEx.class, "lbm"); // LB Encoder
+        RF = hardwareMap.get(DcMotor.class, "rfm"); // RF Encoder
+        RB = hardwareMap.get(DcMotor.class, "rbm"); // RB Encoder
+        LF = hardwareMap.get(DcMotor.class, "lfm"); // LF Encoder
+        LB = hardwareMap.get(DcMotor.class, "lbm"); // LB Encoder
         LA = hardwareMap.get(DcMotorEx.class, "la"); //Left Arm
         RA = hardwareMap.get(DcMotorEx.class, "ra"); //Right Arm
 
@@ -74,23 +61,23 @@ public class RobotHardware {
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
 
 
-        RFServo.setDirection(CRServo.Direction.FORWARD);
+        RFServo.setDirection(CRServo.Direction.REVERSE);
         RBServo.setDirection(CRServo.Direction.REVERSE);
-        LFServo.setDirection(CRServo.Direction.FORWARD);
+        LFServo.setDirection(CRServo.Direction.REVERSE);
         LBServo.setDirection(CRServo.Direction.REVERSE);
 
 
-        LF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        LB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        RF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        RB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         RA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        LF.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        LB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        RF.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        RB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        LF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -127,8 +114,8 @@ public class RobotHardware {
     public void driveSwerveWithControllers(double strafe, double forward, double turn, double throttle) {
         double A = strafe - turn * (WDLength / centerRadius);
         double B = strafe + turn * (WDLength / centerRadius);
-        double C = forward - turn * (WDLength / centerRadius);
-        double D = forward + turn * (WDLength / centerRadius);
+        double C = forward + turn * (WDLength / centerRadius);
+        double D = forward - turn * (WDLength / centerRadius);
         double RFPower = Math.sqrt(B * B + C * C);
         double LFPower = Math.sqrt(B * B + D * D);
         double LBPower = Math.sqrt(A * A + D * D);
@@ -183,32 +170,38 @@ public class RobotHardware {
         RBServo.setPower(RBServoPower);
 
         // if the difference between current angle and target angle is greater than 90, move motor in reverse
-        if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90)
-            RF.setPower(throttle * -RFPower);
-        else RF.setPower(throttle * RFPower);
-        if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 90)
-            LF.setPower(throttle * -LFPower);
-        else LF.setPower(throttle * LFPower);
-        if (Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) > 90)
-            LB.setPower(throttle * -LBPower);
-        else LB.setPower(throttle * LBPower);
-        if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 90)
-            RB.setPower(throttle * -RBPower);
-        else RB.setPower(throttle * RBPower);
+        double RFMotorInput = 0;
+        double LFMotorInput = 0;
+        double LBMotorInput = 0;
+        double RBMotorInput = 0;
+        if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90) RFMotorInput = (throttle * -RFPower);
+        else RFMotorInput = (throttle * RFPower);
+        if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 90) LFMotorInput = (throttle * -LFPower);
+        else LFMotorInput = (throttle * LFPower);
+        if (Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) > 90) LBMotorInput = (throttle * -LBPower);
+        else LBMotorInput = (throttle * LBPower);
+        if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 90) RBMotorInput = (throttle * -RBPower);
+        else RBMotorInput = (throttle * RBPower);
+
+
+        RF.setPower(RFMotorInput);
+        LF.setPower(LFMotorInput);
+        LB.setPower(LBMotorInput);
+        RB.setPower(RBMotorInput);
 
 
         telemetry.addData("RF:", currentRFPosition);
         telemetry.addData("LF:", currentLFPosition);
         telemetry.addData("LB:", currentLBPosition);
         telemetry.addData("RB:", currentRBPosition);
-        telemetry.addData("RFAngle:", RFAngle);
-        telemetry.addData("LFAngle:", LFAngle);
-        telemetry.addData("LBAngle:", LBAngle);
-        telemetry.addData("RBAngle:", RBAngle);
-        telemetry.addData("RFPower:", RFPower);
-        telemetry.addData("LFPower:", LFPower);
-        telemetry.addData("LBPower:", LBPower);
-        telemetry.addData("RBPower:", RBPower);
+        telemetry.addData("RFServoPower:", RFServoPower);
+        telemetry.addData("LFServoPower:", LFServoPower);
+        telemetry.addData("LBServoPower:", LBServoPower);
+        telemetry.addData("RBServoPower:", RBServoPower);
+        telemetry.addData("RFPower:", RFMotorInput);
+        telemetry.addData("LFPower:", LFMotorInput);
+        telemetry.addData("LBPower:", LBMotorInput);
+        telemetry.addData("RBPower:", RBMotorInput);
         telemetry.update();
     }
 
