@@ -17,7 +17,7 @@ public class RobotHardware {
     public final Telemetry telemetry;
 
 
-    public final BNO055IMU imu;
+    // public final BNO055IMU imu;
 
 
     public final DcMotorEx RF, RB, LF, LB, LA, RA;
@@ -28,36 +28,36 @@ public class RobotHardware {
     public Servo DServo;
 
 
-    // VFB Position PID variables
+    // Position PID variables -- PID not set to anything right now
     double PosIntegralSum = 0;
     double PosKp = 0;
     double PosKi = 0;
     double PosKd = 0;
     private double PosLastError = 0;
-
     ElapsedTime PIDtimer = new ElapsedTime();
+
 
     public double WDLength = 9.133858, WDWidth = 9.763780, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
-    public double encoderTicksPerMotorRotation = 1, encoderTicksPerServoRotation = 8192, motorRotationsPerWheelRotation = 1; // needs to be tuned
+    public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
-    public double servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        // IMU is here for probably no reason -- though if the robot stops working without it, un-comment it
 
+        // BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        // parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        // parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        // parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        // parameters.loggingEnabled = true;
+        // parameters.loggingTag = "IMU";
+        // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+        // imu = hardwareMap.get(BNO055IMU.class, "imu");
+        // imu.initialize(parameters);
 
 
         RF = hardwareMap.get(DcMotorEx.class, "rfm"); // RF Encoder
@@ -93,6 +93,7 @@ public class RobotHardware {
         RB.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
@@ -212,7 +213,7 @@ public class RobotHardware {
     }
 
 
-    public double PosPID(double PosReference, double PosState) {
+    public double PosPID(double PosReference, double PosState) { // PID not currently set to anything
         double PosError = PosReference - PosState;
         PosIntegralSum += PosError * PIDtimer.seconds();
         double PosDerivative = (PosError - PosLastError) / PIDtimer.seconds();
