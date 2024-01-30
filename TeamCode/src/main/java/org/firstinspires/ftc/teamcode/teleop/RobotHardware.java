@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.arcrobotics.ftclib.hardware.motors.Motor;
+//import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -47,7 +46,7 @@ public class RobotHardware {
 
     public double WDLength = 9.133858, WDWidth = 9.763780, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
-    public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
+    public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1.5; // increase this if wheels are twitching back and forth. :O
 
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -180,21 +179,11 @@ public class RobotHardware {
         LBServo.setPower(LBServoPower);
         RBServo.setPower(RBServoPower);
 
-        // if the difference between current angle and target angle is greater than 90, move motor in reverse
-        double RFMotorInput = 0;
-        double LFMotorInput = 0;
-        double LBMotorInput = 0;
-        double RBMotorInput = 0;
-        if (Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) > 90) RFMotorInput = (throttle * -RFPower);
-        else RFMotorInput = (throttle * RFPower);
-        if (Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) > 90) LFMotorInput = (throttle * -LFPower);
-        else LFMotorInput = (throttle * LFPower);
-        if (Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) > 90) LBMotorInput = (throttle * -LBPower);
-        else LBMotorInput = (throttle * LBPower);
-        if (Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) > 90) RBMotorInput = (throttle * -RBPower);
-        else RBMotorInput = (throttle * RBPower);
-
-
+        // move the motor in reverse if wheel is rotated 180 degrees from target and stop motors if pointing wrong direction
+        double RFMotorInput = throttle * RFPower * Math.sin(((Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) / 90) - 1) * Math.PI / 2);
+        double LFMotorInput = throttle * LFPower * Math.sin(((Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) / 90) - 1) * Math.PI / 2);
+        double LBMotorInput = throttle * LBPower * Math.sin(((Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) / 90) - 1) * Math.PI / 2);
+        double RBMotorInput = throttle * RBPower * Math.sin(((Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) / 90) - 1) * Math.PI / 2);
         RF.setPower(RFMotorInput);
         LF.setPower(LFMotorInput);
         LB.setPower(LBMotorInput);
