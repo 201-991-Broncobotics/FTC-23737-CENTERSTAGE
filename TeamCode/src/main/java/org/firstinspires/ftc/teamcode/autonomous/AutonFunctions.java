@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class AutonFunctions {
+public class AutonFunctions extends SubsystemBase {
 
-    HardwareMap map;
-    Telemetry telemetry;
-    AutonHardware robot = new AutonHardware(map, telemetry);
+    public final HardwareMap map;
+    public final Telemetry telemetry;
+    public AutonHardware robot;
+    public AutonFunctions(HardwareMap map, Telemetry telemetry){
+        this.map = map;
+        this.telemetry = telemetry;
+        robot = new AutonHardware(map, telemetry);
+    }
     public double[] Errors;
     public double[] getErrors(){
         Errors = new double[4];
@@ -40,8 +46,6 @@ public class AutonFunctions {
         } else {
             robot.LB.isBusy();
         }
-    }
-    public void halfTurn(){ //Turns the servos 90 degrees
     }
 }
 

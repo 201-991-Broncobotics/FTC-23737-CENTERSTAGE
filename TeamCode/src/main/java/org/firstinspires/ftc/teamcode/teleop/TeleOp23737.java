@@ -3,18 +3,12 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-
-@TeleOp(name="TeleOp", group="Iterative Opmode")
-public class BasicTeleOp extends LinearOpMode {
+@TeleOp(name = "TeleOp")
+public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he have an outtake
 
     public void runOpMode() throws InterruptedException {
         RobotHardware robot = new RobotHardware(hardwareMap, telemetry);
@@ -53,6 +47,13 @@ public class BasicTeleOp extends LinearOpMode {
                 robot.LA.setPower(0);
                 robot.RA.setPower(0);
             }
+            if (gamepad2.left_trigger > 0){
+                robot.louttake.setPosition(0.033);
+                robot.routtake.setPosition(0.033);
+            } else if (gamepad2.right_trigger > 0){
+                robot.louttake.setPosition(0);
+                robot.routtake.setPosition(0);
+            }
 
 
             robot.driveSwerveWithControllers(
@@ -69,5 +70,6 @@ public class BasicTeleOp extends LinearOpMode {
         }
     }
 }
+
 
 

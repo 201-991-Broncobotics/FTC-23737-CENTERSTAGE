@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,6 +18,10 @@ public class RobotHardware {
     public final HardwareMap map;
     public final Telemetry telemetry;
 
+    public double amrevs;
+    public double armpos;
+    public final Servo louttake, routtake;
+
 
     public final DcMotorEx LA, RA;
 
@@ -27,6 +32,8 @@ public class RobotHardware {
     public final CRServo RFServo, RBServo, LFServo, LBServo;
 
     public Servo DServo;
+
+    public Motor.Encoder armencoder;
 
 
     // Position PID variables -- PID not set to anything right now
@@ -59,6 +66,8 @@ public class RobotHardware {
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
+        louttake = hardwareMap.get(Servo.class, "louttake");
+        routtake = hardwareMap.get(Servo.class, "routtake");
 
 
         RFServo.setDirection(CRServo.Direction.REVERSE);
@@ -81,6 +90,8 @@ public class RobotHardware {
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
+        armencoder = hardwareMap.get(Motor.Encoder.class, "armencoder");
+        amrevs = armencoder.getRevolutions();
 
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
@@ -216,5 +227,8 @@ public class RobotHardware {
 
         return (PosError * PosKp) + (PosDerivative * PosKd) + (PosIntegralSum * PosKi);
     }
-
+    public double getAmrevs(){
+        armencoder.getRevolutions();
+        return amrevs;
+    }
 }
