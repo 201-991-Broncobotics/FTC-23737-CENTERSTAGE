@@ -19,4 +19,14 @@ public class TankDrive extends SubsystemBase {
         this.telemetry = telemetry;
         robot = new AutonHardware(map, telemetry);
     }
+    public void resetEncoder(){
+        robot.autonencoder.reset();
+    }
+    public void moveForward(double distance){
+        double wd = 3.77953;
+        double ipr = wd * Math.PI; //inches per revolution
+        double move = distance * ipr;
+        //wip
+
+    }
 }

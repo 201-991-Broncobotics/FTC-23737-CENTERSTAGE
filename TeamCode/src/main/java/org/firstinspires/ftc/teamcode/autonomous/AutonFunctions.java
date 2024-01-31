@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class AutonFunctions extends SubsystemBase {
+public class AutonFunctions extends SubsystemBase { //wip lmao
 
     public final HardwareMap map;
     public final Telemetry telemetry;

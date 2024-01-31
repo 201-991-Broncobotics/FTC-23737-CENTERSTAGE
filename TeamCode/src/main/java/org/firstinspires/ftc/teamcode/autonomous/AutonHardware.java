@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class AutonHardware {
+public class AutonHardware { //setting motors to run_to_position for auton
 
     public final HardwareMap map;
     public final Telemetry telemetry;
@@ -80,10 +80,10 @@ public class AutonHardware {
         LA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         RA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        LF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        LB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 

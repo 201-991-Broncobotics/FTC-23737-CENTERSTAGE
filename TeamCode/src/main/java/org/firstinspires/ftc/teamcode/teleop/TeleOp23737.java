@@ -4,10 +4,11 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TeleOp")
+@TeleOp(name = "TeleOp 23737")
 public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he have an outtake
 
     public void runOpMode() throws InterruptedException {
@@ -28,7 +29,6 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
                 robot.DServo.setPosition(0);
             }
             if (gamepad2.left_bumper){
-                robot.getAmrevs();
                 robot.LA.setPower(0.25);
                 robot.RA.setPower(0.25);
                 if (robot.amrevs == 0.5){
@@ -36,7 +36,6 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
                     robot.RA.setPower(0);
                 }
             } else if (gamepad2.right_bumper){
-                robot.getAmrevs();
                 robot.LA.setPower(-0.25);
                 robot.RA.setPower(-0.25);
                 if (robot.amrevs == 0.5){
@@ -46,13 +45,6 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
             } else {
                 robot.LA.setPower(0);
                 robot.RA.setPower(0);
-            }
-            if (gamepad2.left_trigger > 0){
-                robot.louttake.setPosition(0.033);
-                robot.routtake.setPosition(0.033);
-            } else if (gamepad2.right_trigger > 0){
-                robot.louttake.setPosition(0);
-                robot.routtake.setPosition(0);
             }
 
 

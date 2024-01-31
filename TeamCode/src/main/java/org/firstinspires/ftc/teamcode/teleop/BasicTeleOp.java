@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-@TeleOp(name="TeleOp", group="Iterative Opmode")
+@TeleOp(name="TeleOp Basic", group="Iterative Opmode")
 public class BasicTeleOp extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
@@ -34,21 +34,11 @@ public class BasicTeleOp extends LinearOpMode {
                 robot.DServo.setPosition(0);
             }
             if (gamepad2.left_bumper){
-                robot.getAmrevs();
                 robot.LA.setPower(0.25);
                 robot.RA.setPower(0.25);
-                if (robot.amrevs == 0.5){
-                    robot.LA.setPower(0);
-                    robot.RA.setPower(0);
-                }
             } else if (gamepad2.right_bumper){
-                robot.getAmrevs();
                 robot.LA.setPower(-0.25);
                 robot.RA.setPower(-0.25);
-                if (robot.amrevs == 0.5){
-                    robot.LA.setPower(0);
-                    robot.RA.setPower(0);
-                }
             } else {
                 robot.LA.setPower(0);
                 robot.RA.setPower(0);
@@ -56,9 +46,9 @@ public class BasicTeleOp extends LinearOpMode {
 
 
             robot.driveSwerveWithControllers(
-                    Math.abs(gamepad1.right_stick_x) * gamepad1.right_stick_x,
+                    Math.abs(gamepad1.left_stick_x) * gamepad1.left_stick_x,
                     Math.abs(gamepad1.left_stick_y) * gamepad1.left_stick_y,
-                    (Math.abs(gamepad1.left_stick_x) * gamepad1.left_stick_x) * (1 - 0.4 * gamepad1.left_trigger),
+                    (Math.abs(gamepad1.right_stick_x) * gamepad1.right_stick_x) * (1 - 0.4 * gamepad1.left_trigger),
                     (1 - 0.6 * gamepad1.left_trigger) * (1 - gamepad1.right_trigger)); // right trigger stops motors but still lets servos spin
 
 

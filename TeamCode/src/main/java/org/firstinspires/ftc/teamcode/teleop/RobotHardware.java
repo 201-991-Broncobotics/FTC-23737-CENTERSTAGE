@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 //import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -19,7 +20,6 @@ public class RobotHardware {
 
     public double amrevs;
     public double armpos;
-    public final Servo louttake, routtake;
 
 
     public final DcMotorEx LA, RA;
@@ -31,8 +31,6 @@ public class RobotHardware {
     public final CRServo RFServo, RBServo, LFServo, LBServo;
 
     public Servo DServo;
-
-    public Motor.Encoder armencoder;
 
 
     // Position PID variables -- PID not set to anything right now
@@ -65,8 +63,6 @@ public class RobotHardware {
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
-        louttake = hardwareMap.get(Servo.class, "louttake");
-        routtake = hardwareMap.get(Servo.class, "routtake");
 
 
         RFServo.setDirection(CRServo.Direction.REVERSE);
@@ -88,10 +84,6 @@ public class RobotHardware {
         RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-
-        armencoder = hardwareMap.get(Motor.Encoder.class, "armencoder");
-        amrevs = armencoder.getRevolutions();
-
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
         telemetry.update();
@@ -122,10 +114,10 @@ public class RobotHardware {
 
 
     public void driveSwerveWithControllers(double strafe, double forward, double turn, double throttle) {
-        double A = strafe - turn * (WDLength / centerRadius);
-        double B = strafe + turn * (WDLength / centerRadius);
-        double C = forward + turn * (WDLength / centerRadius);
-        double D = forward - turn * (WDLength / centerRadius);
+        double A = -strafe + turn * (WDLength / centerRadius);
+        double B = -strafe - turn * (WDLength / centerRadius);
+        double C = -forward - turn * (WDLength / centerRadius);
+        double D = -forward + turn * (WDLength / centerRadius);
         double RFPower = Math.sqrt(B * B + C * C);
         double LFPower = Math.sqrt(B * B + D * D);
         double LBPower = Math.sqrt(A * A + D * D);
@@ -215,9 +207,5 @@ public class RobotHardware {
         PIDtimer.reset();
 
         return (PosError * PosKp) + (PosDerivative * PosKd) + (PosIntegralSum * PosKi);
-    }
-    public double getAmrevs(){
-        armencoder.getRevolutions();
-        return amrevs;
     }
 }
