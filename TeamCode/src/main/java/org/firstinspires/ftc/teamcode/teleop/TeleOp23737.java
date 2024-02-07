@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TeleOp 23737")
+@TeleOp(name = "no no use :'(")
 public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he have an outtake
 
     public void runOpMode() throws InterruptedException {
@@ -23,25 +23,19 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
 
         while (opModeIsActive() && !isStopRequested()) {
 
-            if (gamepad2.dpad_left){
+            if (gamepad2.dpad_left) {
                 robot.DServo.setPosition(.25);
                 robot.methodSleep(1500);
                 robot.DServo.setPosition(0);
             }
-            if (gamepad2.left_bumper){
+            if (gamepad2.left_bumper) {
                 robot.LA.setPower(0.25);
                 robot.RA.setPower(0.25);
-                if (robot.amrevs == 0.5){
-                    robot.LA.setPower(0);
-                    robot.RA.setPower(0);
-                }
-            } else if (gamepad2.right_bumper){
-                robot.LA.setPower(-0.25);
-                robot.RA.setPower(-0.25);
-                if (robot.amrevs == 0.5){
-                    robot.LA.setPower(0);
-                    robot.RA.setPower(0);
-                }
+                robot.RA.setTargetPosition(575);
+            } else if (gamepad2.right_bumper) {
+                robot.LA.setPower(0.25);
+                robot.RA.setPower(0.25);
+                robot.RA.setTargetPosition(0);
             } else {
                 robot.LA.setPower(0);
                 robot.RA.setPower(0);
@@ -62,6 +56,7 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
         }
     }
 }
+
 
 
 

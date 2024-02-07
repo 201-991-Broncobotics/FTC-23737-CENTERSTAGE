@@ -1,30 +1,50 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 
-@Autonomous(name = "Testing Auton")
-public class DriveTesting extends LinearOpMode {
+@Autonomous(name = "Looking for Prop")
+public class Auton23737 extends CommandOpMode {
 
-    public AutonHardware robot;
+    AutonHardwareMain robot = new AutonHardwareMain(hardwareMap, telemetry);
+    Camera hy = new Camera(hardwareMap);
+    DSensor ds = new DSensor(hardwareMap);
     @Override
-    public void runOpMode() throws InterruptedException {
-
-        robot = new AutonHardware(hardwareMap, telemetry);
+    public void initialize() {
 
         waitForStart();
 
-        Move(0.1, 5);
-        Turn(0.1,90,10);
-        Turn(0.1,-90,10);
+        while (opModeIsActive()) {
+
+            Move(0.25,10);
+            ds.getDsResultOne();
+            ds.getDsResultTwo();
+            ds.getDsResultThree();
+            ds.getComparedDSOne();
+            ds.getComparedDSTwo();
+            ds.getComparedDSThree();
+            if (ds.comparedDSOne == 0){
+                telemetry.addLine("Prop Found in Front");
+                telemetry.update();
+            } else if (ds.comparedDSTwo == 0){
+                telemetry.addLine("Prop Found to Right");
+                telemetry.update();
+                Turn(0.2,90,5);
+            } else if (ds.comparedDSThree == 0){
+                telemetry.addLine("Prop Found to Left");
+                telemetry.update();
+                Turn(0.2,-90,5);
+            }
+        }
     }
     public void Move(double p, double distance_in_inches){
         getMotorPositions();
@@ -95,8 +115,8 @@ public class DriveTesting extends LinearOpMode {
             robot.LBServo.setPower(0);
         }
     }
-    }
-class AutonHardware { //setting motors to run_to_position for auton
+}
+class AutonHardwareMain { //setting motors to run_to_position for auton
 
     public final DcMotor RF, RB, LF, LB, LA, RA;
     public final CRServo RFServo, RBServo, LFServo, LBServo;
@@ -117,7 +137,7 @@ class AutonHardware { //setting motors to run_to_position for auton
     //public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
 
-    public AutonHardware(HardwareMap hardwareMap, Telemetry telemetry) {
+    public AutonHardwareMain(HardwareMap hardwareMap, Telemetry telemetry) {
 
 
         RF = hardwareMap.get(DcMotor.class, "rfm"); // RF Encoder
@@ -159,6 +179,7 @@ class AutonHardware { //setting motors to run_to_position for auton
 
 
     } // initializes everything
+
     public double PosPID(double PosReference, double PosState) { // PID not currently set to anything
         double PosError = PosReference - PosState;
         PosIntegralSum += PosError * PIDtimer.seconds();
@@ -169,10 +190,15 @@ class AutonHardware { //setting motors to run_to_position for auton
 
         return (PosError * PosKp) + (PosDerivative * PosKd) + (PosIntegralSum * PosKi);
     }
-    public void methodSleep(long time){
+
+    public void methodSleep(long time) {
         try {
             Thread.sleep(time * 1000);
         } catch (InterruptedException e) {
         }
     }
 }
+
+
+
+

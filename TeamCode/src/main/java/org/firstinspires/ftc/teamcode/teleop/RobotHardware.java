@@ -17,11 +17,6 @@ public class RobotHardware {
 
     public final HardwareMap map;
     public final Telemetry telemetry;
-
-    public double amrevs;
-    public double armpos;
-
-
     public final DcMotorEx LA, RA;
 
 

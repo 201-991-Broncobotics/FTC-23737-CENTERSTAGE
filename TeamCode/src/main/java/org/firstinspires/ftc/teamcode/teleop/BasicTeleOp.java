@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-@TeleOp(name="TeleOp Basic", group="Iterative Opmode")
+@TeleOp(name="USE THIS ONE!!!!", group="Iterative Opmode")
 public class BasicTeleOp extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
@@ -34,11 +34,11 @@ public class BasicTeleOp extends LinearOpMode {
                 robot.DServo.setPosition(0);
             }
             if (gamepad2.left_bumper){
-                robot.LA.setPower(0.25);
-                robot.RA.setPower(0.25);
+                robot.LA.setPower(0.72);
+                robot.RA.setPower(0.72);
             } else if (gamepad2.right_bumper){
-                robot.LA.setPower(-0.25);
-                robot.RA.setPower(-0.25);
+                robot.LA.setPower(-0.72);
+                robot.RA.setPower(-0.72);
             } else {
                 robot.LA.setPower(0);
                 robot.RA.setPower(0);
