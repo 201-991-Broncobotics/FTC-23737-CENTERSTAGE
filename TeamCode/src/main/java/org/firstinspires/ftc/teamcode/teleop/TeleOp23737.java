@@ -8,11 +8,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "no no use :'(")
-public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he have an outtake
+@TeleOp(name = "DONT USE UNTIL OUTTAKE IS CONFIGURED!!!")
+public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when we have an outtake
+
+    Servo OLServo, ORServo;
 
     public void runOpMode() throws InterruptedException {
+
         RobotHardware robot = new RobotHardware(hardwareMap, telemetry);
+        OLServo = hardwareMap.get(Servo.class, "leftouttake");
+        ORServo = hardwareMap.get(Servo.class, "rightouttake");
 
         Gamepad driver = gamepad1, operator = gamepad2;
 
@@ -23,10 +28,23 @@ public class TeleOp23737 extends LinearOpMode { //Has all mechanisms for when he
 
         while (opModeIsActive() && !isStopRequested()) {
 
-            if (gamepad2.dpad_left) {
+            if (gamepad2.dpad_up) {
                 robot.DServo.setPosition(.25);
                 robot.methodSleep(1500);
                 robot.DServo.setPosition(0);
+            }
+            if (gamepad2.dpad_left){
+                OLServo.getPosition();
+                OLServo.setPosition(0.083);
+            } else if (gamepad2.dpad_right){
+                ORServo.getPosition();
+                ORServo.setPosition(0.083);
+            } else if (gamepad2.x){
+                OLServo.getPosition();
+                OLServo.setPosition(0);
+            } else if (gamepad2.b){
+                ORServo.getPosition();
+                ORServo.setPosition(0);
             }
             if (gamepad2.left_bumper) {
                 robot.LA.setPower(0.25);

@@ -22,9 +22,9 @@ public class DriveTesting extends LinearOpMode {
 
         waitForStart();
 
-        Move(0.1, 5);
-        Turn(0.1,90,10);
-        Turn(0.1,-90,10);
+        MovePID(5,5);
+        TurnPID(90,5);
+        TurnPID(-90,5);
     }
     public void Move(double p, double distance_in_inches){
         getMotorPositions();
@@ -57,6 +57,47 @@ public class DriveTesting extends LinearOpMode {
         robot.RF.setPower(0);
         robot.RB.setPower(0);
     }
+    public void MovePID(double target_distance, double tolerance){
+        double wheelDiameter = 3.77953; // in inches
+        int countsPerRevolution = 580;
+        double wheelCircumference = Math.PI * wheelDiameter;
+        double targetCounts = (target_distance / wheelCircumference) * countsPerRevolution;
+
+        robot.LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.LF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        double error = targetCounts - robot.LF.getCurrentPosition();
+        double lastError = 0;
+        double integral = 0;
+        double derivative;
+        double kp = 0.1; // Proportional gain. Adjust as needed.
+        double ki = 0.01; // Integral gain. Adjust as needed.
+        double kd = 0.1; // Derivative gain. Adjust as needed.
+
+        while (Math.abs(error) > tolerance) {
+            double currentCounts = robot.LF.getCurrentPosition();
+            error = targetCounts - currentCounts;
+            integral += error;
+            derivative = error - lastError;
+            double power = kp * error + ki * integral + kd * derivative;
+
+            robot.LF.setPower(power);
+            robot.LB.setPower(power);
+            robot.RF.setPower(power);
+            robot.RB.setPower(power);
+
+            lastError = error;
+        }
+
+        robot.LF.setPower(0);
+        robot.LB.setPower(0);
+        robot.RF.setPower(0);
+        robot.RB.setPower(0);
+    }
+
     public Integer getMotorPositions(){
         int motorPOS = robot.LF.getCurrentPosition();
         telemetry.addData("LF Position: ", motorPOS);
@@ -66,6 +107,9 @@ public class DriveTesting extends LinearOpMode {
     public Double getCurrentAngle(){
         double currentCount = robot.encoder.getCurrentPosition();
         double currentAngle = (currentCount / 1440.0) * 360.0;
+        if (currentAngle > 180) {
+            currentAngle -= 360;
+        }
         telemetry.addData("Angle: ", currentAngle);
         telemetry.update();
         return currentAngle;
@@ -94,6 +138,36 @@ public class DriveTesting extends LinearOpMode {
             robot.LFServo.setPower(0);
             robot.LBServo.setPower(0);
         }
+    }
+    public void TurnPID(double target_angle, double tolerance){
+        double currentPosition = getCurrentAngle();
+        double error = target_angle - currentPosition;
+        double lastError = 0;
+        double integral = 0;
+        double derivative;
+        double kp = 0.1; // Proportional gain. Adjust as needed.
+        double ki = 0.01; // Integral gain. Adjust as needed.
+        double kd = 0.1; // Derivative gain. Adjust as needed.
+
+        while (Math.abs(error) > tolerance) {
+            currentPosition = getCurrentAngle();
+            error = target_angle - currentPosition;
+            integral += error;
+            derivative = error - lastError;
+            double power = kp * error + ki * integral + kd * derivative;
+
+            robot.RFServo.setPower(power);
+            robot.RBServo.setPower(power);
+            robot.LFServo.setPower(power);
+            robot.LBServo.setPower(power);
+
+            lastError = error;
+        }
+
+        robot.RFServo.setPower(0);
+        robot.RBServo.setPower(0);
+        robot.LFServo.setPower(0);
+        robot.LBServo.setPower(0);
     }
     }
 class AutonHardware { //setting motors to run_to_position for auton

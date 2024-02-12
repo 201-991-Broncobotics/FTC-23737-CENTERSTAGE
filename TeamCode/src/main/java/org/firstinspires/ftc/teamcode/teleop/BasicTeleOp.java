@@ -55,7 +55,7 @@ public class BasicTeleOp extends LinearOpMode {
             telemetry.addData("FPS:", Math.round((1 / (mRuntime.time() - LastTime)) * 1000));
             telemetry.addData("Throttle:", 1 - 0.6 * gamepad1.left_trigger * (1 - gamepad1.right_trigger));
             LastTime = mRuntime.time();
-            //telemetry.update(); // telemetry is temporary updating in swerve drive method to make sure telemetry shows up
+           // telemetry.update(); // telemetry is temporary updating in swerve drive method to make sure telemetry shows up
         }
     }
 }

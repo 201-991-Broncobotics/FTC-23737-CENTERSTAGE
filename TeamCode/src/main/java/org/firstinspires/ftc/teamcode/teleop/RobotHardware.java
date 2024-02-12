@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -60,11 +61,10 @@ public class RobotHardware {
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
 
 
-        RFServo.setDirection(CRServo.Direction.REVERSE);
+        RFServo.setDirection(CRServo.Direction.FORWARD);
         RBServo.setDirection(CRServo.Direction.REVERSE);
         LFServo.setDirection(CRServo.Direction.REVERSE);
         LBServo.setDirection(CRServo.Direction.REVERSE);
-
 
         LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -143,22 +143,11 @@ public class RobotHardware {
         double LFServoPower = 0;
         double LBServoPower = 0;
         double RBServoPower = 0;
-        if (RFPower > 0) {
-            if (RFServoTurnDistance > servoDegreesOfError) RFServoPower = -1;
-            else if (RFServoTurnDistance < -servoDegreesOfError) RFServoPower = 1;
-        }
-        if (LFPower > 0) {
-            if (LFServoTurnDistance > servoDegreesOfError) LFServoPower = -1;
-            else if (LFServoTurnDistance < -servoDegreesOfError) LFServoPower = 1;
-        }
-        if (LBPower > 0) {
-            if (LBServoTurnDistance > servoDegreesOfError) LBServoPower = -1;
-            else if (LBServoTurnDistance < -servoDegreesOfError) LBServoPower = 1;
-        }
-        if (RBPower > 0) {
-            if (RBServoTurnDistance > servoDegreesOfError) RBServoPower = -1;
-            else if (RBServoTurnDistance < -servoDegreesOfError) RBServoPower = 1;
-        }
+
+        if (RFPower > 0 && Math.abs(RFServoTurnDistance) > servoDegreesOfError) RFServoPower = -1 * RFServoTurnDistance / 55.0; // degrees away from target to start slowing down
+        if (LFPower > 0 && Math.abs(LFServoTurnDistance) > servoDegreesOfError) LFServoPower = -1 * LFServoTurnDistance / 55.0;
+        if (LBPower > 0 && Math.abs(LBServoTurnDistance) > servoDegreesOfError) LBServoPower = -1 * LBServoTurnDistance / 5.0;
+        if (RBPower > 0 && Math.abs(RBServoTurnDistance) > servoDegreesOfError) RBServoPower = -1 * RBServoTurnDistance / 5.0;
 
         // set all servo powers at basically the same time
         RFServo.setPower(RFServoPower);
