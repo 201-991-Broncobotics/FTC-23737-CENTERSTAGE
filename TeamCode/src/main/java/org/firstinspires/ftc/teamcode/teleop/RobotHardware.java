@@ -63,7 +63,7 @@ public class RobotHardware {
 
         RFServo.setDirection(CRServo.Direction.FORWARD);
         RBServo.setDirection(CRServo.Direction.REVERSE);
-        LFServo.setDirection(CRServo.Direction.REVERSE);
+        LFServo.setDirection(CRServo.Direction.FORWARD);
         LBServo.setDirection(CRServo.Direction.REVERSE);
 
         LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
