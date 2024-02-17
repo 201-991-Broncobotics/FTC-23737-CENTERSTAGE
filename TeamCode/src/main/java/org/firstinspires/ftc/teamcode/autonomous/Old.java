@@ -6,19 +6,19 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 
-@Autonomous(name = "Testing Auton")
-public class DriveTesting extends LinearOpMode {
+@Autonomous(name = "OLD")
+public class Old extends LinearOpMode {
 
-    public AutonHardware robot;
+    public AutonHardwareOLD robot;
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new AutonHardware(hardwareMap, telemetry);
+        robot = new AutonHardwareOLD(hardwareMap, telemetry);
 
         waitForStart();
 
@@ -78,6 +78,7 @@ public class DriveTesting extends LinearOpMode {
         double kd = 0.1; // Derivative gain. Adjust as needed.
 
         while (Math.abs(error) > tolerance) {
+            telemetry.update();
             double currentCounts = robot.LF.getCurrentPosition();
             error = targetCounts - currentCounts;
             integral += error;
@@ -101,17 +102,15 @@ public class DriveTesting extends LinearOpMode {
     public Integer getMotorPositions(){
         int motorPOS = robot.LF.getCurrentPosition();
         telemetry.addData("LF Position: ", motorPOS);
-        telemetry.update();
         return motorPOS;
     }
     public Double getCurrentAngle(){
-        double currentCount = robot.encoder.getCurrentPosition();
+        double currentCount = robot.LF.getCurrentPosition();
         double currentAngle = (currentCount / 1440.0) * 360.0;
         if (currentAngle > 180) {
             currentAngle -= 360;
         }
         telemetry.addData("Angle: ", currentAngle);
-        telemetry.update();
         return currentAngle;
     }
     public void Turn(double p, double target_angle, double tolerance){
@@ -121,17 +120,19 @@ public class DriveTesting extends LinearOpMode {
         while (Math.abs(currentPosition - target_angle) > tolerance) {
 
             currentPosition = getCurrentAngle();
-
+            telemetry.update();
             if (currentPosition > target_angle) {
                 robot.RFServo.setPower(-p);
                 robot.RBServo.setPower(-p);
                 robot.LFServo.setPower(-p);
                 robot.LBServo.setPower(-p);
+
             } else {
                 robot.RFServo.setPower(p);
                 robot.RBServo.setPower(p);
                 robot.LFServo.setPower(p);
                 robot.LBServo.setPower(p);
+
             }
             robot.RFServo.setPower(0);
             robot.RBServo.setPower(0);
@@ -160,6 +161,7 @@ public class DriveTesting extends LinearOpMode {
             robot.RBServo.setPower(power);
             robot.LFServo.setPower(power);
             robot.LBServo.setPower(power);
+            telemetry.update();
 
             lastError = error;
         }
@@ -168,14 +170,15 @@ public class DriveTesting extends LinearOpMode {
         robot.RBServo.setPower(0);
         robot.LFServo.setPower(0);
         robot.LBServo.setPower(0);
+        telemetry.update();
     }
     }
-class AutonHardware { //setting motors to run_to_position for auton
+class AutonHardwareOLD { //setting motors to run_to_position for auton
 
     public final DcMotor RF, RB, LF, LB, LA, RA;
     public final CRServo RFServo, RBServo, LFServo, LBServo;
 
-    public final Encoder encoder;
+    public DigitalChannel encoder;
 
     // Position PID variables -- PID not set to anything right now
     double PosIntegralSum = 0;
@@ -191,7 +194,7 @@ class AutonHardware { //setting motors to run_to_position for auton
     //public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
 
 
-    public AutonHardware(HardwareMap hardwareMap, Telemetry telemetry) {
+    public AutonHardwareOLD(HardwareMap hardwareMap, Telemetry telemetry) {
 
 
         RF = hardwareMap.get(DcMotor.class, "rfm"); // RF Encoder
@@ -201,12 +204,12 @@ class AutonHardware { //setting motors to run_to_position for auton
         LA = hardwareMap.get(DcMotor.class, "la"); //Left Arm
         RA = hardwareMap.get(DcMotor.class, "ra"); //Right Arm
 
+        encoder = hardwareMap.get(DigitalChannel.class, "encoder");
+
         RFServo = hardwareMap.get(CRServo.class, "rfs");
         RBServo = hardwareMap.get(CRServo.class, "rbs");
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
-
-        encoder = hardwareMap.get(Encoder.class, "encoder");
 
 
         RFServo.setDirection(CRServo.Direction.REVERSE);
@@ -225,7 +228,6 @@ class AutonHardware { //setting motors to run_to_position for auton
         LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
-        encoder.setDirection(Encoder.Direction.FORWARD);
 
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");

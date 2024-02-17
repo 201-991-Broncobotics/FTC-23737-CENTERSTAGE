@@ -24,7 +24,7 @@ public class RobotHardware {
     public final DcMotor RF, RB, LF, LB;
 
 
-    public final CRServo RFServo, RBServo, LFServo, LBServo;
+    public final CRServo RFServo, RBServo, LFServo, LBServo, LOServo, ROServo;
 
     public Servo DServo;
 
@@ -46,7 +46,7 @@ public class RobotHardware {
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-
+// hello! :D -Leo (AKA BIG Z)
         RF = hardwareMap.get(DcMotor.class, "rfm"); // RF Encoder
         RB = hardwareMap.get(DcMotor.class, "rbm"); // RB Encoder
         LF = hardwareMap.get(DcMotor.class, "lfm"); // LF Encoder
@@ -59,27 +59,29 @@ public class RobotHardware {
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
         DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
+        LOServo = hardwareMap.get(CRServo.class, "louttake");
+        ROServo = hardwareMap.get(CRServo.class, "routtake");
 
 
-
+//https://girlfriend.myanima.ai/
         RFServo.setDirection(CRServo.Direction.FORWARD);
         RBServo.setDirection(CRServo.Direction.REVERSE);
         LFServo.setDirection(CRServo.Direction.FORWARD);
         LBServo.setDirection(CRServo.Direction.REVERSE);
+        LOServo.setDirection(CRServo.Direction.FORWARD);
+        ROServo.setDirection(CRServo.Direction.REVERSE);
 
         LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        LA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        RA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         LF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        LA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
         telemetry.update();
@@ -102,7 +104,7 @@ public class RobotHardware {
 
     public void methodSleep(long time) {
         try {
-            Thread.sleep(time);
+            Thread.sleep(time * 1000);
         } catch (InterruptedException e) {
             // Wait the set amount of time in milliseconds while in a method
         }
@@ -179,6 +181,9 @@ public class RobotHardware {
         telemetry.addData("LFPower:", LFMotorInput);
         telemetry.addData("LBPower:", LBMotorInput);
         telemetry.addData("RBPower:", RBMotorInput);
+        telemetry.addData("Turn:", turn);
+        telemetry.addData("Strafe:", strafe);
+        telemetry.addData("Forward", forward);
         telemetry.update();
     }
 

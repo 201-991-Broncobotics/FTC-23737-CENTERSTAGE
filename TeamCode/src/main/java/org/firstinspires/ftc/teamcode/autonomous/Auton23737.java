@@ -1,127 +1,50 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 
-@Autonomous(name = "Looking for Prop")
-public class Auton23737 extends CommandOpMode {
+@Autonomous(name = "Auton23737")
+public class Auton23737 extends LinearOpMode {
 
-    AutonHardwareMain robot = new AutonHardwareMain(hardwareMap, telemetry);
-    Camera hy = new Camera(hardwareMap);
-    DSensor ds = new DSensor(hardwareMap);
+    public AutonHardware robot;
+
     @Override
-    public void initialize() {
+    public void runOpMode() throws InterruptedException {
+
+        robot = new AutonHardware(hardwareMap, telemetry);
 
         waitForStart();
 
-        while (opModeIsActive()) {
+            robot.SwerveDrive(0,1,0, 1);
+            robot.methodSleep(3);
+            robot.SwerveDrive(-1,0,0,1);
+            robot.methodSleep(5);
+            robot.brake();
 
-            Move(0.25,10);
-            ds.getDsResultOne();
-            ds.getDsResultTwo();
-            ds.getDsResultThree();
-            ds.getComparedDSOne();
-            ds.getComparedDSTwo();
-            ds.getComparedDSThree();
-            if (ds.comparedDSOne == 0){
-                telemetry.addLine("Prop Found in Front");
-                telemetry.update();
-            } else if (ds.comparedDSTwo == 0){
-                telemetry.addLine("Prop Found to Right");
-                telemetry.update();
-                Turn(0.2,90,5);
-            } else if (ds.comparedDSThree == 0){
-                telemetry.addLine("Prop Found to Left");
-                telemetry.update();
-                Turn(0.2,-90,5);
-            }
-        }
     }
-    public void Move(double p, double distance_in_inches){
-        getMotorPositions();
-        double wheelDiameter = 3.77953; // in inches
-        int countsPerRevolution = 580;
 
-        double wheelCircumference = Math.PI * wheelDiameter;
-        double revolutions = distance_in_inches / wheelCircumference;
-        int totalCounts = (int) (revolutions * countsPerRevolution);
-
-// Now you can use totalCounts to set your motor target position
-        robot.LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.LF.setTargetPosition(totalCounts);
-        robot.LF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.LF.setPower(p); // Set desired motor power
-        robot.LB.setPower(p);
-        robot.RF.setPower(p);
-        robot.RB.setPower(p);
-
-
-        while (opModeIsActive() && robot.LF.isBusy()) {
-            getMotorPositions();
-        }
-
-        robot.LF.setPower(0); // Stop motor
-        robot.LB.setPower(0);
-        robot.RF.setPower(0);
-        robot.RB.setPower(0);
-    }
-    public Integer getMotorPositions(){
-        int motorPOS = robot.LF.getCurrentPosition();
-        telemetry.addData("LF Position: ", motorPOS);
-        telemetry.update();
-        return motorPOS;
-    }
-    public Double getCurrentAngle(){
-        double currentCount = robot.encoder.getCurrentPosition();
-        double currentAngle = (currentCount / 1440.0) * 360.0;
-        telemetry.addData("Angle: ", currentAngle);
-        telemetry.update();
-        return currentAngle;
-    }
-    public void Turn(double p, double target_angle, double tolerance){
-
-        double currentPosition = getCurrentAngle();
-
-        while (Math.abs(currentPosition - target_angle) > tolerance) {
-
-            currentPosition = getCurrentAngle();
-
-            if (currentPosition > target_angle) {
-                robot.RFServo.setPower(-p);
-                robot.RBServo.setPower(-p);
-                robot.LFServo.setPower(-p);
-                robot.LBServo.setPower(-p);
-            } else {
-                robot.RFServo.setPower(p);
-                robot.RBServo.setPower(p);
-                robot.LFServo.setPower(p);
-                robot.LBServo.setPower(p);
-            }
-            robot.RFServo.setPower(0);
-            robot.RBServo.setPower(0);
-            robot.LFServo.setPower(0);
-            robot.LBServo.setPower(0);
-        }
-    }
 }
-class AutonHardwareMain { //setting motors to run_to_position for auton
+class AutonHardware {
 
-    public final DcMotor RF, RB, LF, LB, LA, RA;
-    public final CRServo RFServo, RBServo, LFServo, LBServo;
+    public final HardwareMap map;
+    public final Telemetry telemetry;
+    public final DcMotorEx LA, RA;
 
-    public final Encoder encoder;
+
+    public final DcMotor RF, RB, LF, LB;
+
+
+    public final CRServo RFServo, RBServo, LFServo, LBServo, LOServo, ROServo;
+
+    public Servo DServo;
+
 
     // Position PID variables -- PID not set to anything right now
     double PosIntegralSum = 0;
@@ -134,51 +57,159 @@ class AutonHardwareMain { //setting motors to run_to_position for auton
 
     public double WDLength = 9.133858, WDWidth = 9.763780, centerRadius = Math.sqrt(WDLength * WDLength + WDWidth * WDWidth);
 
-    //public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1; // increase this if wheels are twitching back and forth. :O
+    public double encoderTicksPerServoRotation = 8192, servoDegreesOfError = 1.5; // increase this if wheels are twitching back and forth. :O
 
 
-    public AutonHardwareMain(HardwareMap hardwareMap, Telemetry telemetry) {
+    public AutonHardware(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
 
-
+// hello! :D -Leo (AKA BIG Z)
         RF = hardwareMap.get(DcMotor.class, "rfm"); // RF Encoder
         RB = hardwareMap.get(DcMotor.class, "rbm"); // RB Encoder
         LF = hardwareMap.get(DcMotor.class, "lfm"); // LF Encoder
         LB = hardwareMap.get(DcMotor.class, "lbm"); // LB Encoder
-        LA = hardwareMap.get(DcMotor.class, "la"); //Left Arm
-        RA = hardwareMap.get(DcMotor.class, "ra"); //Right Arm
+        LA = hardwareMap.get(DcMotorEx.class, "la"); //Left Arm
+        RA = hardwareMap.get(DcMotorEx.class, "ra"); //Right Arm
 
         RFServo = hardwareMap.get(CRServo.class, "rfs");
         RBServo = hardwareMap.get(CRServo.class, "rbs");
         LFServo = hardwareMap.get(CRServo.class, "lfs");
         LBServo = hardwareMap.get(CRServo.class, "lbs");
+        DServo = hardwareMap.get(Servo.class, "drone"); //Drone Servo
+        LOServo = hardwareMap.get(CRServo.class, "louttake");
+        ROServo = hardwareMap.get(CRServo.class, "routtake");
 
-        encoder = hardwareMap.get(Encoder.class, "encoder");
-
-
-        RFServo.setDirection(CRServo.Direction.REVERSE);
+        RFServo.setDirection(CRServo.Direction.FORWARD);
         RBServo.setDirection(CRServo.Direction.REVERSE);
-        LFServo.setDirection(CRServo.Direction.REVERSE);
+        LFServo.setDirection(CRServo.Direction.FORWARD);
         LBServo.setDirection(CRServo.Direction.REVERSE);
+        LOServo.setDirection(CRServo.Direction.FORWARD);
+        ROServo.setDirection(CRServo.Direction.FORWARD);
 
-        RF.setDirection(DcMotorSimple.Direction.REVERSE);
-        RB.setDirection(DcMotorSimple.Direction.REVERSE);
-        LF.setDirection(DcMotorSimple.Direction.FORWARD);
-        LB.setDirection(DcMotorSimple.Direction.FORWARD);
+        LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        LA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        RA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-        LA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        RA.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-
-        encoder.setDirection(Encoder.Direction.FORWARD);
-
+        LF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        LB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.addData("Status: ", "Robot Hardware Initialized");
         telemetry.update();
+        this.map = hardwareMap;
 
 
     } // initializes everything
+
+
+    // finds the smallest difference between two angles or wraps an angle to between -180 and 180 when target is 0 (when wrapAngle is 360)
+    // wrapAngle of 180 treats the targetAngle and the angle opposite of targetAngle the same
+    public double angleDifference(double currentAngle, double targetAngle, int wrapAngle) {
+        double result1 = Math.floorMod(Math.round((targetAngle - currentAngle) * 100), wrapAngle * 100L) * 0.01;
+        double result2 = Math.floorMod(Math.round((targetAngle - currentAngle) * 100), -wrapAngle * 100L) * 0.01;
+        if (Math.abs(result1) <= Math.abs(result2)) return result1;
+        else return result2;
+    }
+
+
+
+    public void methodSleep(long time) {
+        try {
+            Thread.sleep(time * 1000);
+        } catch (InterruptedException e) {
+            // Wait the set amount of time in milliseconds while in a method
+        }
+    }
+
+
+    public void SwerveDrive(double strafe, double forward, double turn, double throttle) {
+        double A = -strafe + turn * (WDLength / centerRadius);
+        double B = -strafe - turn * (WDLength / centerRadius);
+        double C = -forward - turn * (WDLength / centerRadius);
+        double D = -forward + turn * (WDLength / centerRadius);
+        double RFPower = Math.sqrt(B * B + C * C);
+        double LFPower = Math.sqrt(B * B + D * D);
+        double LBPower = Math.sqrt(A * A + D * D);
+        double RBPower = Math.sqrt(A * A + C * C);
+        double max_power = Math.max(1, Math.max(Math.max(RFPower, LFPower), Math.max(LBPower, RBPower))); // keeps all motor powers under 1
+        RFPower = RFPower / max_power; // target motor speeds
+        LFPower = LFPower / max_power;
+        LBPower = LBPower / max_power;
+        RBPower = RBPower / max_power;
+        double RFAngle = Math.toDegrees(Math.atan2(B, C)); // Target wheel angles
+        double LFAngle = Math.toDegrees(Math.atan2(B, D));
+        double LBAngle = Math.toDegrees(Math.atan2(A, D));
+        double RBAngle = Math.toDegrees(Math.atan2(A, C));
+
+        // find current angle in degrees of the swerve wheel and wrap it to between -180 and 180
+        double currentRFPosition = angleDifference(RF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentLFPosition = angleDifference(LF.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentLBPosition = angleDifference(LB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+        double currentRBPosition = angleDifference(RB.getCurrentPosition() / encoderTicksPerServoRotation * 360, 0, 360);
+
+        // move servos in direction of target angle or target angle + 180 depending on which one is closer
+        // unless the change in angle is less than the error range
+        double RFServoTurnDistance = angleDifference(currentRFPosition, RFAngle, 180);
+        double LFServoTurnDistance = angleDifference(currentLFPosition, LFAngle, 180);
+        double LBServoTurnDistance = angleDifference(currentLBPosition, LBAngle, 180);
+        double RBServoTurnDistance = angleDifference(currentRBPosition, RBAngle, 180);
+        double RFServoPower = 0;
+        double LFServoPower = 0;
+        double LBServoPower = 0;
+        double RBServoPower = 0;
+
+        if (RFPower > 0 && Math.abs(RFServoTurnDistance) > servoDegreesOfError) RFServoPower = -1 * RFServoTurnDistance / 55.0; // degrees away from target to start slowing down
+        if (LFPower > 0 && Math.abs(LFServoTurnDistance) > servoDegreesOfError) LFServoPower = -1 * LFServoTurnDistance / 55.0;
+        if (LBPower > 0 && Math.abs(LBServoTurnDistance) > servoDegreesOfError) LBServoPower = -1 * LBServoTurnDistance / 5.0;
+        if (RBPower > 0 && Math.abs(RBServoTurnDistance) > servoDegreesOfError) RBServoPower = -1 * RBServoTurnDistance / 5.0;
+
+        // set all servo powers at basically the same time
+        RFServo.setPower(RFServoPower);
+        LFServo.setPower(LFServoPower);
+        LBServo.setPower(LBServoPower);
+        RBServo.setPower(RBServoPower);
+
+        if (Math.abs(RBServoPower) < 0.02 && Math.abs(LBServoPower) < 0.02 && Math.abs(RFServoPower) < 0.02 && Math.abs(LFServoPower) < 0.02) {
+            // move the motor in reverse if wheel is rotated 180 degrees from target and stop motors if pointing wrong direction
+            double RFMotorInput = throttle * RFPower * Math.sin(((Math.abs(angleDifference(currentRFPosition, RFAngle, 360)) / 90) - 1) * Math.PI / 2);
+            double LFMotorInput = throttle * LFPower * Math.sin(((Math.abs(angleDifference(currentLFPosition, LFAngle, 360)) / 90) - 1) * Math.PI / 2);
+            double LBMotorInput = throttle * LBPower * Math.sin(((Math.abs(angleDifference(currentLBPosition, LBAngle, 360)) / 90) - 1) * Math.PI / 2);
+            double RBMotorInput = throttle * RBPower * Math.sin(((Math.abs(angleDifference(currentRBPosition, RBAngle, 360)) / 90) - 1) * Math.PI / 2);
+            RF.setPower(RFMotorInput);
+            LF.setPower(LFMotorInput);
+            LB.setPower(LBMotorInput);
+            RB.setPower(RBMotorInput);
+
+            telemetry.addData("RFPower:", RFMotorInput);
+            telemetry.addData("LFPower:", LFMotorInput);
+            telemetry.addData("LBPower:", LBMotorInput);
+            telemetry.addData("RBPower:", RBMotorInput);
+        } else {
+            RF.setPower(0);
+            LF.setPower(0);
+            RB.setPower(0);
+            LB.setPower(0);
+        }
+
+        telemetry.addData("RF:", currentRFPosition);
+        telemetry.addData("LF:", currentLFPosition);
+        telemetry.addData("LB:", currentLBPosition);
+        telemetry.addData("RB:", currentRBPosition);
+        telemetry.addData("RFServoPower:", RFServoPower);
+        telemetry.addData("LFServoPower:", LFServoPower);
+        telemetry.addData("LBServoPower:", LBServoPower);
+        telemetry.addData("RBServoPower:", RBServoPower);
+
+        telemetry.addData("Strafe:", strafe);
+        telemetry.addData("Turn:", turn);
+        telemetry.addData("Forward", forward);
+        telemetry.update();
+    }
+
 
     public double PosPID(double PosReference, double PosState) { // PID not currently set to anything
         double PosError = PosReference - PosState;
@@ -190,12 +221,9 @@ class AutonHardwareMain { //setting motors to run_to_position for auton
 
         return (PosError * PosKp) + (PosDerivative * PosKd) + (PosIntegralSum * PosKi);
     }
-
-    public void methodSleep(long time) {
-        try {
-            Thread.sleep(time * 1000);
-        } catch (InterruptedException e) {
-        }
+    public void brake(){
+        SwerveDrive(0,0,0,0);
+        telemetry.addLine("Robot Has Stopped");
     }
 }
 

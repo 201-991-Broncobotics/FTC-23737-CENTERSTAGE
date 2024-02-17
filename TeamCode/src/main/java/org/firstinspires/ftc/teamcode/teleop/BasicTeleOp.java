@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-@TeleOp(name="USE THIS ONE!!!!", group="Iterative Opmode")
+@TeleOp(name="Old", group="Iterative Opmode")
 public class BasicTeleOp extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
